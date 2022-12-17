@@ -1,83 +1,87 @@
-<!-- HTML for the shopping cart -->
-<div id="cart">
-  <h2>Shopping Cart</h2>
-  <table id="cart-items">
-    <tr>
-      <th>Item</th>
-      <th>Price</th>
-      <th>Quantity</th>
-      <th>Total</th>
-      <th></th>
-    </tr>
-  </table>
-  <p id="cart-total"></p>
-  <button id="checkout-button">Checkout</button>
-</div>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Shopping Cart</title>
+</head>
+<body>
+  <!-- HTML for the shopping cart -->
+  <div id="cart">
+    <h2>Shopping Cart</h2>
+    <table id="cart-items">
+      <tr>
+        <th>Item</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Total</th>
+        <th></th>
+      </tr>
+    </table>
+    <p id="cart-total"></p>
+    <button id="checkout-button">Checkout</button>
+  </div>
 
-<!-- JavaScript for the shopping cart -->
-<script>
-  // An array to hold the items in the cart
-  let cart = [];
+  <!-- HTML for the product list -->
+  <div id="products">
+    <h2>Product List</h2>
+    <table>
+      <tr>
+        <td>Product 1</td>
+        <td>$10</td>
+        <td><button onclick="addToCart('Product 1', 10, 1)">Add to cart</button></td>
+      </tr>
+      <tr>
+        <td>Product 2</td>
+        <td>$20</td>
+        <td><button onclick="addToCart('Product 2', 20, 1)">Add to cart</button></td>
+      </tr>
+      <tr>
+        <td>Product 3</td>
+        <td>$30</td>
+        <td><button onclick="addToCart('Product 3', 30, 1)">Add to cart</button></td>
+      </tr>
+    </table>
+  </div>
 
-  // An object to represent an item in the cart
-  function Item(name, price, quantity) {
-    this.name = name;
-    this.price = price;
-    this.quantity = quantity;
-  }
+  <!-- JavaScript for the shopping cart -->
+  <script>
+    // An array to hold the items in the cart
+    let cart = [];
 
-  // A function to add an item to the cart
-  function addToCart(name, price, quantity) {
-    for (let i in cart) {
-      if (cart[i].name === name) {
-        cart[i].quantity += quantity;
-        return;
-      }
+    // An object to represent an item in the cart
+    function Item(name, price, quantity) {
+      this.name = name;
+      this.price = price;
+      this.quantity = quantity;
     }
-    let item = new Item(name, price, quantity);
-    cart.push(item);
-  }
 
-  // A function to remove an item from the cart
-  function removeFromCart(name) {
-    for (let i in cart) {
-      if (cart[i].name === name) {
-        cart[i].quantity--;
-        if (cart[i].quantity === 0) {
-          cart.splice(i, 1);
+    // A function to add an item to the cart
+    function addToCart(name, price, quantity) {
+      for (let i in cart) {
+        if (cart[i].name === name) {
+          // If the item is already in the cart, just update the quantity
+          cart[i].quantity += quantity;
+          return;
         }
-        break;
       }
+      // If the item is not in the cart yet, add it as a new item
+      let item = new Item(name, price, quantity);
+      cart.push(item);
     }
-  }
 
-  // A function to display the items in the cart
-  function displayCart() {
-    let cartTable = document.getElementById("cart-items");
-    let cartTotal = document.getElementById("cart-total");
-    let total = 0;
-    for (let i in cart) {
-      let row = document.createElement("tr");
-      let nameCell = document.createElement("td");
-      let priceCell = document.createElement("td");
-      let quantityCell = document.createElement("td");
-      let totalCell = document.createElement("td");
-      let removeButtonCell = document.createElement("td");
-
-      nameCell.innerHTML = cart[i].name;
-      priceCell.innerHTML = cart[i].price;
-      quantityCell.innerHTML = cart[i].quantity;
-      totalCell.innerHTML = cart[i].price * cart[i].quantity;
-      removeButtonCell.innerHTML = '<button onclick="removeFromCart(\'' + cart[i].name + '\')">Remove</button>';
-
-      row.appendChild(nameCell);
-      row.appendChild(priceCell);
-      row.appendChild(quantityCell);
-      row.appendChild(totalCell);
-      row.appendChild(removeButtonCell);
-      cartTable.appendChild(row);
-
-      total += cart[i].price * cart[i].quantity;
+    // A function to remove an item from the cart
+    function removeFromCart(name) {
+      for (let i in cart) {
+        if (cart[i].name === name) {
+          // Reduce the quantity of the item by 1
+          cart[i].quantity--;
+          // If the quantity is now 0, remove the item from the cart
+          if (cart[i].quantity === 0) {
+            cart.splice(i, 1);
+          }
+          break;
+        }
+      }
+         total += cart[i].price * cart[i].quantity;
     }
     cartTotal.innerHTML = "Total: $" + total;
   }
@@ -92,3 +96,5 @@
   let checkoutButton = document.getElementById("checkout-button");
   checkoutButton.addEventListener("click", checkout);
 </script>
+</body>
+</html>
