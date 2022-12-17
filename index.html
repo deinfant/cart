@@ -1,100 +1,224 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Shopping Cart</title>
-</head>
-<body>
-  <!-- HTML for the shopping cart -->
-  <div id="cart">
-    <h2>Shopping Cart</h2>
-    <table id="cart-items">
-      <tr>
-        <th>Item</th>
-        <th>Price</th>
-        <th>Quantity</th>
-        <th>Total</th>
-        <th></th>
-      </tr>
-    </table>
-    <p id="cart-total"></p>
-    <button id="checkout-button">Checkout</button>
-  </div>
+<!-- This is the product display page -->
+<h1>Product Catalog</h1>
 
-  <!-- HTML for the product list -->
-  <div id="products">
-    <h2>Product List</h2>
-    <table>
-      <tr>
-        <td>Product 1</td>
-        <td>$10</td>
-        <td><button onclick="addToCart('Product 1', 10, 1)">Add to cart</button></td>
-      </tr>
-      <tr>
-        <td>Product 2</td>
-        <td>$20</td>
-        <td><button onclick="addToCart('Product 2', 20, 1)">Add to cart</button></td>
-      </tr>
-      <tr>
-        <td>Product 3</td>
-        <td>$30</td>
-        <td><button onclick="addToCart('Product 3', 30, 1)">Add to cart</button></td>
-      </tr>
-    </table>
-  </div>
+<!-- Each product is displayed in a table row -->
+<table>
+  <tr>
+    <td>Product Name</td>
+    <td>Price</td>
+    <td>Quantity</td>
+    <td>Add to Cart</td>
+  </tr>
+  <tr>
+    <td>Product 1</td>
+    <td>$10</td>
+    <td>
+      <input type="number" value="1" min="1" max="10" id="product1-quantity">
+    </td>
+    <td>
+      <button onclick="addToCart('product1')">Add to Cart</button>
+    </td>
+  </tr>
+  <tr>
+    <td>Product 2</td>
+    <td>$20</td>
+    <td>
+      <input type="number" value="1" min="1" max="10" id="product2-quantity">
+    </td>
+    <td>
+      <button onclick="addToCart('product2')">Add to Cart</button>
+    </td>
+  </tr>
+</table>
 
-  <!-- JavaScript for the shopping cart -->
-  <script>
-    // An array to hold the items in the cart
-    let cart = [];
+<!-- This is the shopping cart display -->
+<h1>Shopping Cart</h1>
 
-    // An object to represent an item in the cart
-    function Item(name, price, quantity) {
-      this.name = name;
-      this.price = price;
-      this.quantity = quantity;
+<table>
+  <tr>
+    <td>Product Name</td>
+    <td>Price</td>
+    <td>Quantity</td>
+    <td>Total</td>
+    <td>Remove</td>
+  </tr>
+  <tr id="cart-item-template" style="display:none;">
+    <td class="cart-item-name"></td>
+    <td class="cart-item-price"></td>
+    <td class="cart-item-quantity">
+      <input type="number" value="1" min="1" max="10" class="cart-item-quantity-input">
+    </td>
+    <td class="cart-item-total"></td>
+    <td><button class="cart-item-remove-button">Remove</button></td>
+  </tr>
+</table>
+
+<!-- This is the checkout form -->
+<h1>Checkout</h1>
+
+<form>
+  <label for="name">Name:</label><br>
+  <input type="text" id="name" required><br>
+  <label for="email">Email:</label><br>
+  <input type="email" id="email" required><br>
+  <label for="address">Address:</label><br>
+  <textarea id="address" required></textarea><br>
+  <button type="submit">Place Order</button>
+</form>
+
+<!-- This is the JavaScript code that powers the shopping cart -->
+<script>
+  // This is the "database" of products in the store
+  const products = {
+    product1: {
+      name: 'Product 1',
+      price: 10,
+    },
+    product2: {
+      name: 'Product 2',
+      price: 20,
+    },
+  };
+
+  // This is the shopping cart, stored in memory as an object
+  let shoppingCart = {};
+
+  // This function is called when the user clicks the "Add to Cart" button for a product
+  function addToCart(productId) {
+    // Get the quantity of the product the user wants to add
+    const quantityInput = document.getElementById(productId + '-quantity');
+    const quantity = parseInt(quantityInput.value, 10);
+
+    // Get the product from the "database"
+    const product = products[productId];
+
+    // Add the product to the shopping cart
+    if (shoppingCart[productId]) {
+      // If the product is already in the cart, update the quantity
+      shoppingCart[productId].quantity += quantity;
+    } else {
+      // If the product is not in the cart, add it with the specified quantity
+      shoppingCart[productId] = {
+        name: product.name,
+        price: product.price,
+        quantity: quantity,
+      };
     }
 
-    // A function to add an item to the cart
-    function addToCart(name, price, quantity) {
-      for (let i in cart) {
-        if (cart[i].name === name) {
-          // If the item is already in the cart, just update the quantity
-          cart[i].quantity += quantity;
-          return;
-        }
-      }
-      // If the item is not in the cart yet, add it as a new item
-      let item = new Item(name, price, quantity);
-      cart.push(item);
-    }
-
-    // A function to remove an item from the cart
-    function removeFromCart(name) {
-      for (let i in cart) {
-        if (cart[i].name === name) {
-          // Reduce the quantity of the item by 1
-          cart[i].quantity--;
-          // If the quantity is now 0, remove the item from the cart
-          if (cart[i].quantity === 0) {
-            cart.splice(i, 1);
-          }
-          break;
-        }
-      }
-         total += cart[i].price * cart[i].quantity;
-    }
-    cartTotal.innerHTML = "Total: $" + total;
+    // Update the display
+    updateShoppingCartDisplay();
   }
 
-  // A function to handle the checkout process
-  function checkout() {
-    // This is just a placeholder for a more complex checkout process
-    alert("Thanks for shopping with us! Your total is $" + total + ".");
+  // This function is called when the user changes the quantity of a product in the cart
+  function updateQuantity(productId) {
+    // Get the updated quantity from the input field
+    const quantityInput = document.querySelector(`#cart-item-${productId} .cart-item-quantity-input`);
+    const quantity = parseInt(quantityInput.value, 10);
+
+    // Update the quantity in the shopping cart
+    shoppingCart[productId].quantity = quantity;
+
+    // Update the display
+    updateShoppingCartDisplay();
   }
 
-  // Add an event listener to the checkout button
-  let checkoutButton = document.getElementById("checkout-button");
-  checkoutButton.addEventListener("click", checkout);
+  // This function is called when the user clicks the "Remove" button for a product in the cart
+  function removeFromCart(productId) {
+    // Remove the product from the shopping cart
+    delete shoppingCart[productId];
+
+    // Update the display
+    updateShoppingCartDisplay();
+  }
+
+   // This function updates the shopping cart display to reflect the current state of the cart
+  function updateShoppingCartDisplay() {
+    // Get the shopping cart table
+    const shoppingCartTable = document.querySelector('table');
+
+    // Remove all existing rows from the table (except for the template row)
+    for (let i = shoppingCartTable.children.length - 1; i > 0; i--) {
+      shoppingCartTable.removeChild(shoppingCartTable.children[i]);
+    }
+
+    // Calculate the total cost of the cart
+    let totalCost = 0;
+
+    // Add a new row for each item in the cart
+    for (const productId in shoppingCart) {
+      const cartItem = shoppingCart[productId];
+
+      // Clone the template row
+      const row = document.getElementById('cart-item-template').cloneNode(true);
+      row.style.display = '';
+      row.setAttribute('id', `cart-item-${productId}`);
+
+      // Fill in the cells with the product data
+      row.querySelector('.cart-item-name').textContent = cartItem.name;
+      row.querySelector('.cart-item-price').textContent = '$' + cartItem.price;
+      row.querySelector('.cart-item-quantity-input').value = cartItem.quantity;
+      row.querySelector('.cart-item-total').textContent = '$' + (cartItem.price * cartItem.quantity);
+
+      // Add event listeners to the buttons
+      row.querySelector('.cart-item-quantity-input').addEventListener('change', () => updateQuantity(productId));
+      row.querySelector('.cart-item-remove-button').addEventListener('click', () => removeFromCart(productId));
+
+      // Add the row to the table
+      shoppingCartTable.appendChild(row);
+
+      // Add the total cost of this item to the overall total
+      totalCost += cartItem.price * cartItem.quantity;
+    }
+
+    // Update the total cost display
+    document.querySelector('.cart-total').textContent = 'Total: $' + totalCost;
+  }
+
+  // This function is called when the user clicks the "Add to Cart" button for a product
+  function addToCart(productId) {
+    // Get the quantity of the product the user wants to add
+    const quantityInput = document.getElementById(productId + '-quantity');
+    const quantity = parseInt(quantityInput.value, 10);
+
+    // Get the product from the "database"
+    const product = products[productId];
+
+    // Add the product to the shopping cart
+    if (shoppingCart[productId]) {
+      // If the product is already in the cart, update the quantity
+      shoppingCart[productId].quantity += quantity;
+    } else {
+      // If the product is not in the cart, add it with the specified quantity
+      shoppingCart[productId] = {
+        name: product.name,
+        price: product.price,
+        quantity: quantity,
+      };
+    }
+
+    // Update the display
+    updateShoppingCartDisplay();
+  }
+
+  // This function is called when the user changes the quantity of a product in the cart
+  function updateQuantity(productId) {
+    // Get the updated quantity from the input field
+    const quantityInput = document.querySelector(`#cart-item-${productId} .cart-item-quantity-input`);
+    const quantity = parseInt(quantityInput.value, 10);
+
+    // Update the quantity in the shopping cart
+    shoppingCart[productId].quantity = quantity;
+
+    // Update the display
+    updateShoppingCartDisplay();
+  }
+
+  // This function is called when the user clicks the "Remove" button for a product in the cart
+  function removeFromCart(productId) {
+    // Remove the product from the shopping cart
+    delete shoppingCart[productId];
+
+    // Update the display
+    updateShoppingCartDisplay();
+  }
 </script>
-</body>
-</html>
